@@ -1,0 +1,106 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+namespace org.example.akcess
+
+enum VerifierScale {
+  o BANK
+  o UNIVERSITY
+  o HOSPITAL
+}
+
+enum CheckIfVerified {
+  o UNVERIFIED
+  o APPROVED
+  o REJECTED
+}
+
+concept AddressDetails {
+  o String building optional
+  o String street optional
+  o String city optional
+  o String country optional
+  o String postalCode optional
+}
+
+concept ContactDetails {
+  o String emailAddress optional
+  o String mobileNumber optional
+  o String officeNumber optional
+}
+
+concept UserDetails {
+  o String fullName
+  o String middleName
+  o String lastName
+  o AddressDetails addressDetails optional
+  o ContactDetails contactDetails optional
+  --> Document documentId optional
+}
+
+concept VerifierDetails {
+  o String verifierName
+  o String Grade
+  o String Score
+  o String logo
+  o AddressDetails addressDetails optional
+  o ContactDetails contactDetails optional
+}
+
+asset OriginalDocument identified by odocumentId {
+  --> Verifier Verifier
+  o String odocumentId
+  o String description
+  o String hash
+  o String VerifierHId
+}
+
+asset Document identified by documentId {
+  --> User User
+  o String documentId
+  o String description
+  o String hash
+  o CheckIfVerified checkIfVerified default = "UNVERIFIED"
+  o String VerifierHId optional
+}
+
+participant User identified by userHId {
+  o String userHId
+  o UserDetails userDetails optional
+}
+
+participant Verifier identified by verifierHId {
+  o String verifierHId
+  o VerifierScale verifierScale
+  o VerifierDetails verifierDetails optional
+}
+
+//user can add a document 
+transaction addDocument {
+  o Document document
+}
+
+//Verify the Document by Verifier only
+transaction verifyDocument {
+  --> Verifier verifier
+  --> Document document
+  --> OriginalDocument odocument
+  o CheckIfVerified checkIfVerified
+}
+
+transaction shareDocument {
+}
+
+transaction compareHash {
+}
